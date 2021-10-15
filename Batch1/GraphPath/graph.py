@@ -14,3 +14,14 @@ def get_data(s: str) -> List[int]:
             lastSpace = False
 
     return [int(n) for n in formatted.split(' ')]
+
+def main():
+    values = []
+    with open("example.txt") as file_handle:
+        for line in file_handle:
+            t_list = get_data(line)
+            values.append(t_list)
+    print(values)
+
+if __name__ == '__main__':
+    main()
