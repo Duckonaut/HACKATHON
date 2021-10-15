@@ -1,4 +1,3 @@
-
 import csv
 with open('fakturka.csv', newline='') as csvfile:
     product_list = []
@@ -10,4 +9,4 @@ with open('fakturka.csv', newline='') as csvfile:
         print("podatek VAT = ", row[2], "%")
         print ("narzut = ", row[3], "%")
         print ("CENA SKLEPOWA = ", cena)
-        print (30*"-")
+        print (30 * "-")
