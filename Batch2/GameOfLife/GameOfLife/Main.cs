@@ -138,7 +138,7 @@ namespace GameOfLife
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear(Color.Black);
+			GraphicsDevice.Clear(Color.White);
 
 			spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp);
 
@@ -146,8 +146,8 @@ namespace GameOfLife
 			{
 				for (int j = 0; j < 16; j++)
 				{
-					spriteBatch.Draw(pixel, new Rectangle(i * 16 + 1, j * 16 + 1, 14, 14), Color.White);
-					spriteBatch.Draw(pixel, new Rectangle(i * 16 + 3, j * 16 + 3, 10, 10), Color.Black);
+					//spriteBatch.Draw(pixel, new Rectangle(i * 16 + 1, j * 16 + 1, 14, 14), Color.White);
+					spriteBatch.Draw(pixel, new Rectangle(i * 16 + 1, j * 16 + 1, 14, 14), Color.Black);
 
 					if (gameBoard[i, j]) 
 						spriteBatch.Draw(pixel, new Rectangle(i * 16 + 4, j * 16 + 4, 8, 8), Color.White);
