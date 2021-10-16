@@ -1,7 +1,12 @@
 import requests
 import json
 
-API_KEY = '746e9c61af92a0707383733b40c34bde'
+
+file = open('api-key.txt', 'r')
+
+API_KEY = file.read()
+
+file.close()
 
 def toCelsius(temperature):
     return int(temperature - 273.15)
