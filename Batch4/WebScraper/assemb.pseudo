@@ -1,0 +1,41 @@
+global    _start
+
+          section   .text
+_start:
+		mov       rax, 1                  ; system call for write
+        mov       rdi, 1                  ; file handle 1 is stdout
+
+        mov r8, [zero]
+        mov r9, [zero]
+        mov	al, [tritri]
+  petla:
+		mov r12, message
+		add r12, r8
+        mov	ah, [bl]
+        cmp	ah, al
+        je    dalej
+        add r8, one
+        add r9, one
+        jmp petla
+
+ dalej:
+        mov       rsi, message + r8  ; + przesuniecie          ; address of string to output
+        mov       rdx, len - r9   ;  - przesuniecie               ; number of bytes
+        syscall                           ; invoke operating system to do the write
+
+        mov       rsi, message            ; address of string to output
+        mov       rdx, r9 ; =przesunięscie              ; number of bytes
+        syscall                           ; invoke operating system to do the write
+
+        mov       rax, 60                 ; system call for exit
+        xor       rdi, rdi                ; exit code 0
+        syscall                           ; invoke operating system to exit
+
+        section   .data
+message:  db        "Hello ! World", 10
+len :   	equ $-message
+tritri: 	db 33
+four:		db 4
+zero:		db 0
+one:		db 1
+eight:		db 8
