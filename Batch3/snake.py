@@ -1,16 +1,16 @@
 import pygame
-import time
 from random import randint
 
 White = (255, 255, 255)
 Green = (50, 250, 30)
 GRAY = (30, 30, 30)
 GRAYER = (50, 50, 50)
+BLACK = (0, 0, 0)
 
 LINE_WIDTH = 1
 WIDTH = HEIGHT = 640
 
-FPS = 140
+FPS = 6
 
 pygame.init()
 
@@ -34,6 +34,7 @@ class Field:
         self._snake = Snake()
         self._grid = []
         self.apple = ()
+        self.points = 0
 
         for n in range(16):
             self._grid.append([])
@@ -41,6 +42,13 @@ class Field:
                 self._grid[n].append(Square(n, m))
 
         self.spawnApple()
+
+    def draw_text(self, x, y, string, col, size):
+        font = pygame.font.SysFont("Impact", size)
+        text = font.render(string, True, col)
+        textbox = text.get_rect()
+        textbox.center = (x, y)
+        self._win.blit(text, textbox)
 
     def spawnApple(self):
         x = randint(0, 15)
@@ -63,10 +71,17 @@ class Field:
 
     def endGame(self):
         self._win.fill(White)
+        x, y = WIDTH//2, HEIGHT//2
+        self.draw_text(x+2, y-2, "Game Over (Space to restart)", BLACK, 40)
+        self.draw_text(x+2, y-2, "Game Over (Space to restart)", BLACK, 40)
+        self.draw_text(x-2, y+2, "Game Over (Space to restart)", BLACK, 40)
+        self.draw_text(x-2, y+2, "Game Over (Space to restart)", BLACK, 40)
+        self.draw_text(x, y, "Game Over (Space to restart)", Green, 40)
 
     def updateSnake(self):
+        global FPS
         self.Snake().update()
-        if (self.getSquare(self.Snake().X(), self.Snake().Y()).lifespan > 0):
+        if self.getSquare(self.Snake().Y(), self.Snake().X()).lifespan > 0:
             self.Snake()._dead = True
 
         if self.Snake()._dead:
@@ -76,6 +91,9 @@ class Field:
             square.col = Green
             square.lifespan = self.Snake().segments
             if (self.Snake().Y(), self.Snake().X()) == self.apple:
+                self.points += 1
+                if self.points % 3 == 0:
+                    FPS += 1
                 self.Snake().segments += 1
                 self.spawnApple()
 
@@ -94,6 +112,13 @@ class Field:
                     if square.lifespan != 0:
                         pygame.draw.rect(self._win, square.col, (col * self.SQUARE_SIZE, row * self.SQUARE_SIZE, self.SQUARE_SIZE, self.SQUARE_SIZE))
                         square.lifespan -= 1
+
+            x, y = WIDTH//2, HEIGHT//2 - 100
+            self.draw_text(x+2, y-2, f"{self.points}", BLACK, 40)
+            self.draw_text(x+2, y-2, f"{self.points}", BLACK, 40)
+            self.draw_text(x-2, y+2, f"{self.points}", BLACK, 40)
+            self.draw_text(x-2, y+2, f"{self.points}", BLACK, 40)
+            self.draw_text(x, y, f"{self.points}", Green, 40)
 
 
 class Snake:
@@ -130,30 +155,35 @@ class Snake:
 
 
 def main():
-    to_update = 0
+    global FPS
     run = True
     clock = pygame.time.Clock()
     field = Field(WIN)
     while run:
-        to_update += 1
         clock.tick(FPS)
+        turned = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and not turned:
                 if (event.key == pygame.K_a and field.Snake()._direction != 1):
                     field.Snake().Direction(3)
+                    turned = True
                 elif (event.key == pygame.K_w and field.Snake()._direction != 2):
                     field.Snake().Direction(0)
+                    turned = True
                 elif (event.key == pygame.K_s and field.Snake()._direction != 0):
                     field.Snake().Direction(2)
+                    turned = True
                 elif (event.key == pygame.K_d and field.Snake()._direction != 3):
                     field.Snake().Direction(1)
+                    turned = True
+                elif (event.key == pygame.K_SPACE and field.Snake()._dead):
+                    field = Field(WIN)
+                    FPS = 6
 
-        if to_update > 20:
-            to_update = 0
-            field.update()
-            pygame.display.update()
+        field.update()
+        pygame.display.update()
 
     pygame.quit()
 
