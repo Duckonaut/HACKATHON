@@ -16,7 +16,7 @@ def on_click(x, y, button, pressed):
 
     if pressed and not windowActive:
         rgb = PIL.ImageGrab.grab().load()[x, y]
-        
+
         windowActive = True
         listener.stop()
 
@@ -27,11 +27,11 @@ def on_click(x, y, button, pressed):
 
         colorValues = f'RGB: {rgb}'
         label = label = tk.Label(text=colorValues, width=400, height=200, wraplength=400, font=("Arial", 16), fg=rgbToHex((255 - rgb[0], 255 - rgb[1], 255 - rgb[2])))
-        label['bg'] = rgbToHex(rgb)  
+        label['bg'] = rgbToHex(rgb)
         label.pack()
 
         app.mainloop()
-        
+
 listener = None
 
 def main():
