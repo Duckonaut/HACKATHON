@@ -1,13 +1,18 @@
 import requests
 import json
 
-API_KEY = '746e9c61af92a0707383733b40c34bde'
+
+file = open('api-key.txt', 'r')
+
+API_KEY = file.read()
+
+file.close()
 
 def toCelsius(temperature):
     return int(temperature - 273.15)
 
 def printData(dailyInfo):
-    print(f'\t\tTemperatures between {toCelsius(dailyInfo["temp"]["min"])}-{toCelsius(dailyInfo["temp"]["max"])} degrees Celsius')
+    print(f'\t\tTemperatures between {toCelsius(dailyInfo["temp"]["min"])} and {toCelsius(dailyInfo["temp"]["max"])} degrees Celsius')
     print(f'\t\tWeather is {dailyInfo["weather"][0]["description"]}')
 
 def main():
@@ -37,7 +42,7 @@ def main():
         else:
             directionLon = 'N'
 
-        print(f"Weather for {abs(location[0])}{directionLat}, {abs(location[1])}{directionLon}")
+        print(f"Weather for {abs(int(location[0]))}{directionLat}, {abs(int(location[1]))}{directionLon}")
 
     
     print('\tToday:')
