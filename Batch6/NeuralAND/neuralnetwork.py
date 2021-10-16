@@ -5,7 +5,7 @@ import random
 import numpy
 
 DATASET = [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 1]]
-LEARN_COUNT = 100
+LEARN_COUNT = 1000
 
 # two input nodes, one output
 # output node has 3 weights, input0, input1 and bias
@@ -47,7 +47,7 @@ def calculateAccuracy(network: BooleanNetwork, dataset: List[List[int]]) -> floa
     cumulativeError = 0
 
     for r in dataset:
-        cumulativeError = r[2] - network.calculate(r[0], r[1])
+        cumulativeError = cumulativeError + abs(r[2] - network.calculate(r[0], r[1]))
             
     
     return 1 - cumulativeError / testNumber
