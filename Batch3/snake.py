@@ -3,6 +3,7 @@ import time
 from random import randint
 
 White = (255, 255, 255)
+Red = (255, 0, 0)
 Green = (50, 250, 30)
 GRAY = (30, 30, 30)
 GRAYER = (50, 50, 50)
@@ -51,7 +52,7 @@ class Field:
 
         square = self.getSquare(x, y)
         square.lifespan = -1
-        square.col = White
+        square.col = Red
 
         self.apple = (x, y)
 
