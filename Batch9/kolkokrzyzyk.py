@@ -19,11 +19,13 @@ class Tile:
     def __init__(self, x, y) -> None:
         self.x = x
         self.y = y
-        self.choice = None
+        self.choice = -1
 
 
 class Field:
     def __init__(self, win) -> None:
+        self.imagex = pygame.image.load(r'x.jpg')
+        self.imageo = pygame.image.load(r'o.jpg')
         self._win = win
         self.SQUARE_SIZE = 200
         self.grid = []
@@ -44,11 +46,19 @@ class Field:
         for row in range(0, 3):
             for col in range(0, 3):
                 tile = self.grid[row][col]
-                if tile.choice is not None:
+                if tile.choice != -1:
                     if tile.choice == 0:
-                        pygame.draw.rect(self._win, (0, 0, 0), (col * self.SQUARE_SIZE, row * self.SQUARE_SIZE, self.SQUARE_SIZE, self.SQUARE_SIZE))
+                        self._win.blit(self.imagex, (0, 0))
                     else:
-                        pygame.draw.rect(self._win, (255, 255, 255), (col * self.SQUARE_SIZE, row * self.SQUARE_SIZE, self.SQUARE_SIZE, self.SQUARE_SIZE))
+                        self._win.blit(self.imageo, (0, 0))
+
+    def getAvailable(self):
+        available = []
+        for row in range(0, 3):
+            for col in range(0, 3):
+                if self.grid[row][col].choice == -1:
+                    available.append((row, col))
+        return available
 
     def update(self):
         self.draw()
@@ -58,12 +68,20 @@ class Field:
         col = x // 200
         return self.grid[row][col]
 
+    def endGame(self):
+        pass
+
     def move(self, x, y):
         tile = self.detectTile(x, y)
-        tile.choice = 0
-        bot_move = choice(self.available) #tu
-        self.detectTile(bot_row, bot_col).choice = 1
-        self.update()
+        if tile.choice == -1:
+            tile.choice = 0
+            possibilities = self.getAvailable()
+            if (len(possibilities) > 0):
+                bot_move = choice(possibilities)
+                self.grid[bot_move[0]][bot_move[1]].choice = 1
+                self.update()
+            else:
+                self.endGame()
 
 
 def main():
