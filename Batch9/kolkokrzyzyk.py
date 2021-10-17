@@ -24,9 +24,10 @@ class Tile:
 
 class Field:
     def __init__(self, win) -> None:
-        self.imagex = pygame.image.load(r'x.jpg')
-        self.imageo = pygame.image.load(r'o.jpg')
+        self.imagex = pygame.transform.scale(pygame.image.load(r'x.png'), (200, 200))
+        self.imageo = pygame.transform.scale(pygame.image.load(r'o.png'), (200, 200))
         self._win = win
+        self.end = False
         self.SQUARE_SIZE = 200
         self.grid = []
         self.turn = 0
@@ -48,9 +49,9 @@ class Field:
                 tile = self.grid[row][col]
                 if tile.choice != -1:
                     if tile.choice == 0:
-                        self._win.blit(self.imagex, (0, 0))
+                        self._win.blit(self.imagex, (col * 200, row * 200))
                     else:
-                        self._win.blit(self.imageo, (0, 0))
+                        self._win.blit(self.imageo, (col * 200, row * 200))
 
     def getAvailable(self):
         available = []
@@ -60,6 +61,13 @@ class Field:
                     available.append((row, col))
         return available
 
+    def draw_text(self, x, y, string, col, size):
+        font = pygame.font.SysFont("Impact", size)
+        text = font.render(string, True, col)
+        textbox = text.get_rect()
+        textbox.center = (x, y)
+        self._win.blit(text, textbox)
+
     def update(self):
         self.draw()
 
@@ -68,20 +76,90 @@ class Field:
         col = x // 200
         return self.grid[row][col]
 
-    def endGame(self):
-        pass
+    def endGame(self, result):
+        self.update()
+        self.end = True
+        text = "REMIS"
+        if result == 0:
+            text = "WYGRYWA KRZYŻYK"
+        if result == 1:
+            text = "WYGRYWA KÓŁKO"
+
+        x, y = 300, 300
+        self.draw_text(x+2, y-2, text, (255, 255, 255), 40)
+        self.draw_text(x+2, y-2, text, (255, 255, 255), 40)
+        self.draw_text(x-2, y+2, text, (255, 255, 255), 40)
+        self.draw_text(x-2, y+2, text, (255, 255, 255), 40)
+        self.draw_text(x, y, text, (0, 0, 0), 40)
+
+        x, y = 300, 350
+        text = "Spacja, aby zagrać ponownie"
+        self.draw_text(x+2, y-2, text, (255, 255, 255), 20)
+        self.draw_text(x+2, y-2, text, (255, 255, 255), 20)
+        self.draw_text(x-2, y+2, text, (255, 255, 255), 20)
+        self.draw_text(x-2, y+2, text, (255, 255, 255), 20)
+        self.draw_text(x, y, text, (0, 0, 0), 20)
+        pygame.display.update()
+
+    def checkWinHorizontal(self, choice):
+        winHorizontal = True
+        for row in range(0, 3):
+            winHorizontal = True
+            for col in range(0, 3):
+                if self.grid[row][col].choice != choice:
+                    winHorizontal = False
+            if winHorizontal:
+                return True
+        return False
+
+    def checkWinVertical(self, choice):
+        winVertical = True
+        for col in range(0, 3):
+            winVertical = True
+            for row in range(0, 3):
+                if self.grid[row][col].choice != choice:
+                    winVertical = False
+            if winVertical:
+                return True
+        return False
+
+    def checkWinDiagonal(self, choice):
+        winDiagonal1 = True
+        winDiagonal2 = True
+        for i in range(0, 3):
+            if self.grid[i][2-i].choice != choice:
+                winDiagonal1 = False
+        for i in range(0, 3):
+            if self.grid[i][i].choice != choice:
+                winDiagonal2 = False
+        return winDiagonal1 or winDiagonal2
+
+    def checkWin(self, choice):
+        winH = self.checkWinHorizontal(choice)
+        winV = self.checkWinVertical(choice)
+        winD = self.checkWinDiagonal(choice)
+        return winH or winV or winD
 
     def move(self, x, y):
         tile = self.detectTile(x, y)
         if tile.choice == -1:
             tile.choice = 0
+
+            if self.checkWin(0):
+                self.endGame(0)
+                return
+
             possibilities = self.getAvailable()
             if (len(possibilities) > 0):
                 bot_move = choice(possibilities)
                 self.grid[bot_move[0]][bot_move[1]].choice = 1
                 self.update()
+                if self.checkWin(1):
+                    self.endGame(1)
+                    return
             else:
-                self.endGame()
+                self.endGame(-1)
+                return
 
 
 def main():
@@ -94,11 +172,15 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and field.end:
+                    field = Field(WIN)
+            if event.type == pygame.MOUSEBUTTONDOWN and not field.end:
                 x, y = pygame.mouse.get_pos()
                 field.move(x, y)
-        field.update()
-        pygame.display.update()
+        if not field.end:
+            field.update()
+            pygame.display.update()
 
     pygame.quit()
 
